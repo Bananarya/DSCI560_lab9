@@ -1,15 +1,16 @@
 import streamlit as st
 from dotenv import load_dotenv
 from PyPDF2 import PdfReader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_text_splitters import CharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 #from langchain.embeddings import OpenAIEmbeddings, HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_openai import ChatOpenAI
-from langchain.memory import ConversationBufferMemory
-from langchain_community.chains import ConversationalRetrievalChain
+from langgraph.checkpoint.memory import MemorySaver
+#yong bu liao zhe ge conversationalREtrivalChain
+#from langchain.chains import ConversationalRetrievalChain
 from htmlTemplates import css, bot_template, user_template
-from langchain import HuggingFacePipeline
+#from langchain import HuggingFacePipeline
 from langchain_community.llms import LlamaCpp
 
 
@@ -23,7 +24,7 @@ def get_pdf_text(pdf_docs):
 
 
 def get_text_chunks(text):
-    text_splitter = RecursiveCharacterTextSplitter(
+    text_splitter = CharacterTextSplitter(
         separator="\n",
         chunk_size=500,
         chunk_overlap=100,
@@ -51,9 +52,9 @@ def get_conversation_chain(vectorstore):
     # llm = LlamaCpp(
     #     model_path="models/llama-2-7b-chat.ggmlv3.q4_1.bin",  n_ctx=1024, n_batch=512)
 
-    memory = ConversationBufferMemory(
+    memory = MemorySaver(
         memory_key='chat_history', return_messages=True)
-    conversation_chain = ConversationalRetrievalChain.from_llm(
+    conversation_chain = create_history_aware_retriever.from_llm(
         llm=llm,
         retriever=vectorstore.as_retriever(
             search_type="similarity", search_kwargs={"k": 4}),
@@ -107,8 +108,8 @@ def main():
                 vectorstore = get_vectorstore(text_chunks)
 
                 # create conversation chain
-                st.session_state.conversation = get_conversation_chain(
-                    vectorstore)
+                #st.session_state.conversation = get_conversation_chain(
+                    #vectorstore)
 
 
 if __name__ == '__main__':
